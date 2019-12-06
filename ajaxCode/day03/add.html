@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        .add {
+            width: 1000px;
+            margin: 0 auto;
+        }
+        input {
+            height: 30px;
+        }
+        input[type=button] {
+            background-color: #007bff;
+            width: 50px;
+            border-radius: 5px;
+            border: 0;
+            color: #fff;
+        }
+        img {
+            width: 50px;
+            height: 50px;
+             
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+
+        }
+        td {
+            padding: 10px;
+        }
+        tr {
+            border-top: 1px solid #ccc;
+            border-bottom: 1px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+    <div class="add">
+        <h1>王者荣耀 英雄管理器</h1>
+        <form id="formid">
+            <input type="hidden" value="" name="img" class="saveimg">
+            <table>
+                <tr>
+                    <td>姓名:</td>
+                    <td><input type="text" class="name" name="name"></td>
+                </tr>
+                <tr>
+                    <td>性别：</td>
+                    <td><input type="radio" name="gender" value="男" checked>男<input type="radio" name="gender" value="女">女</td>
+                </tr>
+                <tr>
+                    <td>头像：</td>
+                    <td>
+                        <img src="../../static/images/0.jpg" alt="" class="img">
+                        <input type="file" name="img" id="upload">
+                    </td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td><input type="button" value="新增" class="addhero"></td>
+                </tr>
+            </table>
+        </form>
+    </div>
+</body>
+<script src="../../static/js/jquery.js"></script>
+<script>
+    //上传图片
+    $('.saveimg').val('0.jpg') //设置一个默认图
+
+    $('#upload').change(function() {
+        console.dir(this);
+        //拿到图片
+        let file = this.files[0];
+        let fd = new FormData();
+        fd.append('pic',file)
+        $.ajax({
+            url: 'http://127.0.0.1:8080/uploadHeadImg',
+            type: 'post',
+            data: fd,
+            processData: false,
+            contentType:false,
+            success: function(res) {
+                console.log(res);
+                if(res.code === 200) {
+                    $('.img').attr('src','../' + res.baseDir + res.filePath);
+                    //并把路径存到隐藏表单里方便发送到服务器
+                    $('.saveimg').attr('value',res.filePath)
+                }
+                
+            }
+})
+    })
+    $('.addhero').click(function() {
+        if($('.name').val().trim().length === 0) {
+            return;
+        }
+        let data = $('#formid').serialize();
+       $.ajax({
+           url:'http://127.0.0.1:8080/addNewHero',
+           type: 'post',
+           data: data,
+           success: function(res) {
+            console.log(res);
+            location.href = './index.html';
+           }
+       })
+    })
+</script>
+</html>

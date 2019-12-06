@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        .hero {
+            width: 1000px;
+            margin: 0 auto;
+        }
+        .herohd a {
+            display: inline-block;
+            padding: 10px;
+            border-radius: 3px;
+            background-color: #28a745;
+            text-decoration: none;
+            color: #fff;
+            opacity: 0.8;
+        }
+        .herohd a.quit {
+            display: none;
+            float: right;
+            background-color: #007bff;
+        }
+        .herohd a.login {
+            float: right;
+        }
+        .herohd a.add {
+            display: none;
+            /* float: left; */
+        }
+        .herohd a:hover {
+            opacity: 1;
+        }
+        #tb {
+            display: none;
+            width: 1000px;
+            border-collapse: collapse;
+            text-align: center;
+        }
+        img {
+            width: 50px;
+            height: 50px;
+        }
+        tr {
+            /* display: table-row;
+        vertical-align: inherit;
+        border-color: inherit; */
+        border-top: 1px solid #ccc;
+        border-bottom: 1px solid #ccc;
+        }
+        td,
+        th {
+            padding: 10px 0;
+
+        }
+    </style>
+</head>
+<body>
+    <div class="hero">
+        <div class="herohd">
+            <h1>王者荣耀 <span>英雄管理器</span></h1>
+            <a href="./add.html" class="add">添加英雄</a>
+            <a href="javascript:;" class="quit">退出</a>
+            <a href="javascript:;" class="login">登录</a>
+        </div>
+        <div class="herobd">
+            <table id="tb">
+                <thead>
+                    <tr>
+                        <th>编号</th>
+                        <th>名称</th>
+                        <th>性别</th>
+                        <th>头像</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- <tr>
+                        <td>1</td>
+                        <td>a</td>
+                        <td>女</td>
+                        <td><img src="../../static/images/0.jpg"</td>
+                        <td>
+                            <a href="javascript:;">修改</a>
+                            <a href="javascript:;">删除</a>
+                        </td>
+                    </tr> -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+<script src="../../static/js/jquery.js"></script>
+<!-- 引入模板引擎 -->
+<script src="../../static/js/template-web.js"></script>
+<!-- 设置模板 -->
+<script type="text/template" id="tp">
+    <!-- for循环遍历数组 -->
+    <% for(let i =0; i < $data.length; i++) { %>
+        <tr>
+                <td><%=$data[i].id %></td>
+                <td><%=$data[i].name %></td>
+                <td><%=$data[i].gender %></td>
+                <td><img src="../../static/images/<%=$data[i].img %>"</td>
+                <td>
+                    <a href="./edit.html?id=<%=$data[i].id %>" class="modify">修改</a>
+                    <a href="javascript:;" class="del" data-id = "<%=$data[i].id %>">删除</a>
+                </td>
+            </tr>
+    <%}%>
+</script>
+<script>
+    //判断是否已经登录
+    let id = localStorage.getItem('loginId');
+    $.ajax({
+        url: 'http://127.0.0.1:8080/isLogin',
+        type: 'get',
+        data: {
+            id: id
+        },
+        success: function(res) {
+           //如果已经登录
+           if(res.code === 200) {
+               //显示英雄列表
+               $('#tb').show();
+               $('.add').show();
+               $('.quit').show();
+               $('.login').hide();
+               //获取英雄 动态生成到页面上
+               $.ajax({
+                   url: 'http://127.0.0.1:8080/getAllHero',
+                   type:'post',
+                   success: function (res) { 
+                    console.log(res.data);
+                    
+                    $('tbody').append(template('tp',res.data));
+                    }
+               })
+           }else {
+               //跳转登录页面
+               location.href = './login.html';
+           }
+            
+        }
+    })
+    //委托删除
+    $('#tb').on('click','.del',function () {
+        let id = $(this).attr('data-id');
+        console.log(id);
+        
+        //根据id找到英雄
+        $.ajax({
+            url: 'http://127.0.0.1:8080/deleteHeroById',
+            type: 'get',
+            data: {
+                id: id
+            },
+            success: (res) => { 
+                $(this).parents('tr').remove();
+
+             }
+        }) 
+     })
+</script>
+</html>

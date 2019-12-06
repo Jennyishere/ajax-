@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        .login {
+            width: 1000px;
+            margin: 50px auto;
+        }
+        .login h2 {
+            font-weight: normal;
+        }
+        .box {
+            margin-left: 100px;
+        }
+        input {
+            height: 40px;
+        }
+        input[type=button] {
+            width: 100px;
+            background-color: #007bff;
+            border: 0;
+            color: #fff;
+            border-radius: 5px;
+        }
+        input[type=button]:hover {
+            background-color: #0069d9;
+        }
+        input[type=text],
+        input[type=password] {
+           width: 800px;
+        }
+        p.tip {
+            margin-top: -10px;
+            font-size: 12px;
+        }
+        .tips {
+            margin: 0 auto;
+            border: 1px solid transparent;
+            width: 400px;
+            height: 60px;
+        }
+        .tips p {
+            display: none;
+            height: 30px;
+            line-height: 30px;
+            background-color: #801224;
+            text-align: center;
+            font-size: 18px;
+            color: aliceblue;
+        }
+    </style>
+</head>
+
+<body>
+        <div class="tips">
+                <p></p>
+            </div>
+    <div class="login">
+        <h2>请登录</h2>
+        <div class="box">
+            <p>用户名</p>
+            <p>
+                <input type="text" class="username" name="name">
+                <p class="tip">请输入您的用户名</p>
+            </p>
+            <p>密码</p>
+            <p>
+                <input type="password" class="password" name="name">
+                <p class="tip">请输入您的密码</p>
+            </p>
+            <p>
+                <input type="button" value="登录" id="login">
+                <input type="button" value="注册" id="register">
+            </p>
+        </div>
+    </div>
+</body>
+<script src="../../static/js/jquery.js"></script>
+<script>
+    function tips(content) { 
+        $('.tips p').show();
+        $('.tips p').text(content);
+        setTimeout(() => {
+        $('.tips p').hide();
+        }, 2000);
+     }
+     //注册按钮
+     $('#register').click(function () { 
+        location.href = './register.html';
+      })
+     //登录按钮
+    $('#login').click(function() {
+        if($('.username').val().trim().length === 0) {
+            tips('用户名不能为空')
+        }else if($('.password').val().trim().length === 0) {
+            tips('密码不能为空')
+        }else{
+            $.ajax({
+                url: 'http://127.0.0.1:8080/doLogin',
+                type:'post',
+                data: {
+                    userName: $('.username').val(),
+                    password: $('.password').val(),
+                },
+                success: function (res) { 
+                    if(res.code === 200) {
+                        tips(res.msg + '  正在跳转')
+                        $('.tips p').css('backgroundColor','green');
+                        localStorage.setItem('loginId',res.userId);
+                    setTimeout(() => {
+                        location.href = './index.html';
+                    }, 3000);
+                    }else{
+                        tips(res.msg)
+                    }
+                 }
+            })
+        }
+    })
+</script>
+</html>

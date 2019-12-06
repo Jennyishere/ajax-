@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    <div class="box"></div>
+</body>
+<!-- <script src="../../static/js/jquery.js"></script> -->
+<script src="myajax.js"></script>
+<script>
+    // $.ajax({
+    //     url: 'http://127.0.0.1:8080/getRandomJocke',
+    //     type: 'get',
+    //     success: function(res) {
+    //         $('.box').text(res);
+            
+    //     }
+    // })
+
+    //原生的方法使用ajax
+    //get 无请求参数
+    //创建
+    // let xhr = new XMLHttpRequest();
+    // //设置
+    // xhr.open('get','http://127.0.0.1:8080/getRandomJocke')
+    // //发送请求
+    // xhr.send()
+    // //监听
+    // xhr.onreadystatechange = function() {
+    //     if(xhr.readyState === 4 && xhr.status ===200) {
+    //         console.log(xhr.responseText);
+    //     }
+    // }
+
+
+    //get 请求参数 userName = jen
+    //创建
+    // let xhr = new XMLHttpRequest();
+    // //设置
+    // xhr.open('get','http://127.0.0.1:8080/isUserNameExist?userName=jen')
+    // //发送请求
+    // xhr.send()
+    // //监听
+    // xhr.onreadystatechange = function() {
+    //     if(xhr.readyState === 4 && xhr.status ===200) {
+    //         console.log(xhr.responseText);
+    //     }
+    // }
+
+
+    
+    //post 请求参数 userName = jenn password=123456a phone=15202014560
+    //创建
+    // let xhr = new XMLHttpRequest();
+    // //设置
+    // xhr.open('post','http://127.0.0.1:8080/doRegister')
+    // //发送请求
+
+    // xhr.setRequestHeader('Content-Type','application/x-www-form-urlencoded')
+    // xhr.send('userName=jenn&password=123456a&phone=15202014560')
+    // //监听
+    // xhr.onreadystatechange = function() {
+    //     if(xhr.readyState === 4 && xhr.status ===200) {
+    //         console.log(xhr.responseText);
+    //     }
+    // }
+
+
+    //用我们自己封装的ajax验证数据
+        // ajax('http://127.0.0.1:8080/isUserNameExist','get','userName=jen', function(res) {
+        //     console.log(res);
+        // })
+        // ajax('http://127.0.0.1:8080/doRegister','post','userName=jenbf&password=123456a&phone=12345678910', function(res) {
+        //     console.log(res);
+        // })
+        // ajax('http://127.0.0.1:8080/doRegister','get','userName=jenf&password=123456a&phone=12345678910', function(res) {
+        //     console.log(res);
+        // })
+        ajax({
+            url:'http://127.0.0.1:8080/doRegister',
+            type:'post',
+            data:{
+                userName:'jenfA',
+                password:'123456a',
+                phone:'12345678920' 
+            },
+            success: function(res) {
+            console.log(res);
+        }})
+</script>
+</html>

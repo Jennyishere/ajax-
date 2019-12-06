@@ -1,0 +1,183 @@
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Hero - Admin</title>
+  <link rel="stylesheet" href="../../static/css/bootstrap.css">
+  <style>
+    .hero-list img {
+      width: 50px;
+      height: 50px;
+      display: block
+    }
+
+    .hero-list td {
+      height: 50px;
+      line-height: 50px;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="page-header container">
+      <h1>王者荣耀 <small>英雄管理器</small></h1>
+      
+      <a href="javascript:void(0);" class="btn btn-exit btn-primary" hidden  style='float:right;'>退出</a>
+      <a href="login.html" class="btn btn-login btn-success" style='float:right'>登录</a>
+    </div>
+  </header>
+  <div class="container hero-list">
+    <a class="btn btn-add btn-success pull-right" hidden href="./add.html">添加英雄</a>
+    <table class="table table-hover" hidden>
+      <thead>
+        <tr>
+          <th>编号</th>
+          <th>名称</th>
+          <th>性别</th>
+          <th>头像</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody id="tbody">
+        <!-- <tr>
+          <td>1</td>
+          <td>狗蛋</td>
+          <td>男</td>
+          <td><img src="../static/images/0.jpg"></td>
+          <td><a href="./edit.html?id=1">修改</a> 
+            <a data-id="1" href="javscript:void(0);">删除</a>
+          </td>
+        </tr> -->
+      </tbody>
+    </table>
+  </div>
+   
+  <!-- Modal -->
+  <div class="modal fade" id="modelId" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h5 class="modal-title">提示</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        <div class="modal-body">
+          <div class="container-fluid">
+            你确定要删除吗？
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
+          <button type="button" class="btn btn-primary btn-sure-del" data-id="null">确定</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  
+  </script>
+</body>
+<script src="../../static/js/jquery.js"></script>
+<script src="../../static/js/bootstrap.js"></script>
+<script src="../../static/js/template-web.js"></script>
+<script type="text/template" id="tp">
+  <% for(var i = 0; i < $data.length; i++) {%>
+  <tr>
+      <td><%= $data[i].id %></td>
+      <td><%= $data[i].name %></td>
+      <td><%= $data[i].gender %></td>
+      <td><img src="../../static/images/<%= $data[i].img %>"></td>
+      <td><a href="./edit.html?id=<%= $data[i].id %>">修改</a> 
+        <a data-id="<%= $data[i].id %>" class="del" href="javscript:void(0);">删除</a>
+      </td>
+    </tr>
+    <% } %>
+</script> 
+<script>
+  // 今天的作业标准：1.把登录验证，主页数据展示，增加新英雄，删除英雄的代码写至少3遍，感觉自己没熟练的自觉加遍数。2.把主页的模板引擎的原生语法写法，转换成标准语法。3.把昨天的ajax封装再写(3+)遍, 4.把浏览器和服务器的交互流程的图片看一遍，把交互过程理解一下，5.每次请求数据，在network工具里面调试，观察请求报文和响应报文
+  //判断是否已经登录
+  let id = localStorage.getItem('userId');
+  console.log(id);
+  
+  $.ajax({
+    url: 'http://127.0.0.1:8080/isLogin',
+    type: 'get',
+    data: {
+      id: id
+    },
+    success: function(res) {
+      if(res.code !== 200) {
+       
+       $('#modelId').modal();
+        $('.container-fluid').text('请登录');
+        
+      }else {
+        $('.btn-login').hide();
+        $('.btn-exit').removeAttr('hidden');
+        $('.table').removeAttr('hidden');
+        $('.btn-add').removeAttr('hidden');
+        
+        //请求数据
+        $.ajax({
+          url: 'http://127.0.0.1:8080/getAllHero',
+          type: 'post',
+          success: function(res) {
+            console.log(res);
+           let result = template('tp',res.data)
+           console.log(result);
+           $('#tbody').append(result);
+          }
+        })
+      }
+    }
+  })
+  //点击确定跳转到登录页面或者删除
+  let status = 'login';
+  let btn = null;
+  $('.btn-sure-del').click(function() {
+    if(status == 'login'){
+      location.href = './login.html';
+    }else if(status == 'del') {
+ //删除英雄
+    //去数据找到相应的id删除
+   
+    let id = btn.attr('data-id');
+    console.log(id);
+    $.ajax({
+      url:'http://127.0.0.1:8080/deleteHeroById',
+      type:'get',
+      data: {
+        id : id
+      },
+      success: (res)=>{ 
+        btn.parents('tr').remove();
+       }
+    })
+    $('#modelId').modal('hide');
+    }
+
+  })
+  $('#tbody').on('click','.del', function() {
+    $('#modelId').modal();
+        $('.container-fluid').text('确定要删除吗');
+        btn = $(this);
+        status = 'del';
+    })
+</script>
+<!-- <script type="text/template" id="template">
+  {{each $data value}}
+  //原生 {{%=%}}
+  <tr data-id="{{value.id}}">
+      <td>{{value.id}}</td>
+      <td>{{value.name}}</td>
+      <td>{{value.gender}}</td>
+      <td><img src="../static/images/{{value.img}}"></td>
+      <td><a href="./edit.html?id={{value.id}}">修改</a>
+        <a data-id="1" class="del" data-toggle="modal" data-target="#modelId" data-whatever="{{value.id}}" href="javscript:void(0);">删除</a>
+      </td>
+    </tr>
+  {{/each}}
+</script> -->
+</html>
